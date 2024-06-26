@@ -7,16 +7,17 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { Feather, FontAwesome, FontAwesome5, Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import Animated, {
   SlideInDown,
   interpolate,
-  useAnimatedRef,
   useAnimatedStyle,
-  useScrollViewOffset,
+  useSharedValue,
+  withSpring,
+  withTiming,
 } from "react-native-reanimated";
 import { WebView } from 'react-native-webview';
 
@@ -41,6 +42,9 @@ const ListingDetails = () => {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
+  const scrollOffset = useSharedValue(0);
+  const scrollRef = useRef<Animated.ScrollView>(null);
+
   useEffect(() => {
     if (!id) {
       setError("No ID provided");
@@ -57,7 +61,19 @@ const ListingDetails = () => {
         }
         const data = await response.json();
         console.log("Fetched data:", data);
-        setListing(data);
+        const styledHtmlContent = `
+        <style>
+          body {
+            font-size: 45px; /* Zwiększ rozmiar czcionki */
+            line-height: 1.6; /* Zwiększ interlinię */
+          }
+        </style>
+        ${data.html_content}
+      `;
+      setListing({
+        ...data,
+        html_content: styledHtmlContent,
+      });
         setLoading(false);
       } catch (error) {
         console.error("Error fetching exercise:", error);
@@ -69,8 +85,6 @@ const ListingDetails = () => {
     fetchExercise();
   }, [id]);
 
-  const scrollRef = useAnimatedRef<Animated.ScrollView>();
-  const scrollOffset = useScrollViewOffset(scrollRef);
   const imageAnimatedStyle = useAnimatedStyle(() => {
     return {
       transform: [
@@ -167,6 +181,10 @@ const ListingDetails = () => {
       <View style={styles.container}>
         <Animated.ScrollView
           ref={scrollRef}
+          onScroll={(event) => {
+            scrollOffset.value = event.nativeEvent.contentOffset.y;
+          }}
+          scrollEventThrottle={16}
           contentContainerStyle={{ paddingBottom: 150 }}
         >
           <Animated.Image
@@ -174,8 +192,8 @@ const ListingDetails = () => {
             style={[styles.image, imageAnimatedStyle]}
           />
           <View style={styles.contentWrapper}>
-            <Text style={styles.listingName}>{listing.title}</Text>
-            <Text style={styles.listingShortDescription}>{listing.short_description}</Text>
+            {/* <Text style={styles.listingName}>{listing.title}</Text>
+            <Text style={styles.listingShortDescription}>{listing.short_description}</Text> 
 
             <View style={styles.highlightWrapper}>
               <View style={{ flexDirection: "row" }}>
@@ -196,7 +214,7 @@ const ListingDetails = () => {
                   <Text style={styles.highlightTxtVal}>{listing.language}</Text>
                 </View>
               </View>
-            </View>
+            </View> */}
 
             <WebView
               originWhitelist={['*']}
@@ -206,7 +224,7 @@ const ListingDetails = () => {
           </View>
         </Animated.ScrollView>
       </View>
-
+{/* 
       <Animated.View style={styles.footer} entering={SlideInDown.delay(200)}>
         <TouchableOpacity
           onPress={() => {}}
@@ -217,7 +235,7 @@ const ListingDetails = () => {
         <TouchableOpacity onPress={() => {}} style={styles.footerBtn}>
           <Text style={styles.footerBtnTxt}>Details</Text>
         </TouchableOpacity>
-      </Animated.View>
+      </Animated.View> */}
     </>
   );
 };
@@ -275,7 +293,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   webView: {
-    height: 400, // Adjust the height based on your needs
+    height: 800, // Adjust the height based on your needs
     marginTop: 20,
   },
   listingDetails: {

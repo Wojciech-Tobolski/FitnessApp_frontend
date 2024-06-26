@@ -17,6 +17,7 @@ import Listings from "@/components/Listings";
 import listingData from "@/data/destinations.json";
 import GroupListings from "@/components/GroupListings";
 import groupData from "@/data/groups.json";
+import PersonalWorkout from "@/components/PersonalWorkout";
 
 const Page = () => {
   const headerHeight = useHeaderHeight();
@@ -64,8 +65,9 @@ const Page = () => {
       />
       <View style={[styles.container, { paddingTop: headerHeight }]}>
         <ScrollView showsVerticalScrollIndicator={false}>
-          <Text style={styles.headingTxt}>Explore The Beautiful World!</Text>
 
+          <Text style={styles.headingTxt}>Explore The Beautiful World!</Text>
+{/* 
           <View style={styles.searchSectionWrapper}>
             <View style={styles.searchBar}>
               <Ionicons
@@ -79,11 +81,13 @@ const Page = () => {
             <TouchableOpacity onPress={() => {}} style={styles.filterBtn}>
               <Ionicons name="options" size={28} color={Colors.white} />
             </TouchableOpacity>
-          </View>
+          </View> */}
+
+          <PersonalWorkout />
 
           <CategoryButtons onCategoryChanged={onCatChanged} />
 
-          <Listings listings={listingData} category={category} />
+          <Listings category={category} />
 
           <GroupListings listings={groupData} />
         </ScrollView>
@@ -105,6 +109,7 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     color: Colors.black,
     marginTop: 10,
+    marginBottom: 20,
   },
   searchSectionWrapper: {
     flexDirection: "row",
@@ -122,5 +127,8 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 10,
     marginLeft: 20,
+  },
+  spacing: {
+    marginBottom: 20, // Dodaje przerwę między elementami
   },
 });

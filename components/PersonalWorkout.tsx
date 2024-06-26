@@ -10,56 +10,42 @@ import {
 } from "react-native";
 import { ListingType } from "@/types/listingType";
 import Colors from "@/constants/Colors";
-import { FontAwesome5, Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 
-type Props = {
-  category: string;
-};
-
-const Listings = ({ category }: Props) => {
-  const [listings, setListings] = useState<ListingType[]>([]);
-  const [filteredItems, setFilteredItems] = useState<ListingType[]>([]);
+const PersonalWorkouts = () => {
+  const [personalWorkouts, setPersonalWorkouts] = useState<ListingType[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const fetchListings = async () => {
+    const fetchPersonalWorkouts = async () => {
       setLoading(true);
       try {
-        const response = await fetch('http://192.168.1.32:8000/api/exercises/');
+        const response = await fetch('http://192.168.1.32:8000/api/personalworkout/');
         const data = await response.json();
-        setListings(data);
+        setPersonalWorkouts(data);
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching listings:", error);
+        console.error("Error fetching personal workouts:", error);
         setLoading(false);
       }
     };
 
-    fetchListings();
+    fetchPersonalWorkouts();
   }, []);
-
-  useEffect(() => {
-    const filtered = category === "All"
-      ? listings
-      : listings.filter((item) => item.type.toString() === category);
-
-    setFilteredItems(filtered);
-  }, [category, listings]);
 
   const renderItems: ListRenderItem<ListingType> = ({ item }) => {
     return (
-      <Link href={`/listing/${item.id}`} asChild>
+        <Link href={`/personalworkout/${item.id}`} asChild>
         <TouchableOpacity>
           <View style={styles.item}>
-            <Image source={{ uri: item.image }} style={styles.image} />
+            <Image source={require('../assets/images/workout.jpg')} style={styles.image} />
             <Text style={styles.itemTxt} numberOfLines={1} ellipsizeMode="tail">
               {item.title}
             </Text>
             <View
               style={{ flexDirection: "row", justifyContent: "space-between" }}
             >
-              <Text style={styles.itemPriceTxt}>{item.short_description}</Text>
+              <Text style={styles.itemPriceTxt}>{item.workout_date}</Text>
             </View>
           </View>
         </TouchableOpacity>
@@ -69,8 +55,9 @@ const Listings = ({ category }: Props) => {
 
   return (
     <View>
+    <Text style={styles.title}>Your personal workouts</Text>
       <FlatList
-        data={loading ? [] : filteredItems}
+        data={loading ? [] : personalWorkouts}
         renderItem={renderItems}
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -79,15 +66,21 @@ const Listings = ({ category }: Props) => {
   );
 };
 
-export default Listings;
+export default PersonalWorkouts;
 
 const styles = StyleSheet.create({
+    title: {
+        fontSize: 22,
+        fontWeight: "700",
+        color: Colors.black,
+      },
   item: {
     backgroundColor: Colors.white,
     padding: 10,
     borderRadius: 10,
     marginRight: 20,
     width: 220,
+    marginBottom: 20,
   },
   image: {
     width: 200,

@@ -27,7 +27,7 @@ const CategoryButtons = ({ onCategoryChanged }: Props) => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch('http://192.168.1.59:8000/api/exercise-types/');
+        const response = await fetch('http://192.168.1.32:8000/api/exercise-types/');
         const data: Category[] = await response.json();
         setCategories([{ id: 0, type_name: "Wszystkie" }, ...data]);  // Dodaj kategorię "Wszystkie"
       } catch (error) {
@@ -55,7 +55,7 @@ const CategoryButtons = ({ onCategoryChanged }: Props) => {
 
   return (
     <View>
-      <Text style={styles.title}>Categories</Text>
+      <Text style={styles.title}>Exercise</Text>
       <ScrollView
         ref={scrollRef}
         horizontal
@@ -100,6 +100,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "700",
     color: Colors.black,
+    
   },
   categoryBtn: {
     flexDirection: "row",
