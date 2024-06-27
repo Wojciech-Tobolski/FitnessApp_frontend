@@ -11,6 +11,7 @@ import {
 import { ListingType } from "@/types/listingType";
 import Colors from "@/constants/Colors";
 import { Link } from "expo-router";
+import config from '@/config';
 
 const PersonalWorkouts = () => {
   const [personalWorkouts, setPersonalWorkouts] = useState<ListingType[]>([]);
@@ -20,7 +21,7 @@ const PersonalWorkouts = () => {
     const fetchPersonalWorkouts = async () => {
       setLoading(true);
       try {
-        const response = await fetch('http://192.168.1.32:8000/api/personalworkout/');
+        const response = await fetch(`${config.API_BASE_URL}/personalworkout/`);
         const data = await response.json();
         setPersonalWorkouts(data);
         setLoading(false);

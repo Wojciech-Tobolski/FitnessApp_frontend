@@ -19,6 +19,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated";
+import config from '@/config';
 const { width } = Dimensions.get("window");
 
 type ExerciseType = {
@@ -52,7 +53,7 @@ const WorkoutDetails = () => {
     const fetchWorkout = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://192.168.1.32:8000/api/personalworkout/${id}/`);
+        const response = await fetch(`${config.API_BASE_URL}/personalworkout/${id}/`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -61,7 +62,7 @@ const WorkoutDetails = () => {
 
         // Fetch exercises data
         const exerciseIds = workoutData.exercises.join(',');
-        const exercisesResponse = await fetch(`http://192.168.1.32:8000/api/exercises/`);
+        const exercisesResponse = await fetch(`${config.API_BASE_URL}/exercises/`);
         if (!exercisesResponse.ok) {
           throw new Error(`HTTP error! status: ${exercisesResponse.status}`);
         }

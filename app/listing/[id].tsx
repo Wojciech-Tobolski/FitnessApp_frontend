@@ -20,6 +20,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { WebView } from 'react-native-webview';
+import config from '@/config';
 
 const { width } = Dimensions.get("window");
 const IMG_HEIGHT = 300;
@@ -55,7 +56,7 @@ const ListingDetails = () => {
     const fetchExercise = async () => {
       try {
         console.log("Fetching exercise with ID:", id);
-        const response = await fetch(`http://192.168.1.32:8000/api/exercises/${id}/`);
+        const response = await fetch(`${config.API_BASE_URL}/exercises/${id}/`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -225,7 +226,7 @@ const ListingDetails = () => {
         </Animated.ScrollView>
       </View>
 
-      <Animated.View style={styles.footer} entering={SlideInDown.delay(200)}>
+      {/* <Animated.View style={styles.footer} entering={SlideInDown.delay(200)}>
         <TouchableOpacity
           onPress={() => {}}
           style={[styles.footerBtn, styles.footerBookBtn]}
@@ -235,7 +236,7 @@ const ListingDetails = () => {
         <TouchableOpacity onPress={() => {}} style={styles.footerBtn}>
           <Text style={styles.footerBtnTxt}>Details</Text>
         </TouchableOpacity>
-      </Animated.View>
+      </Animated.View> */}
     </>
   );
 };

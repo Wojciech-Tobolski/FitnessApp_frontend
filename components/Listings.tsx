@@ -12,6 +12,7 @@ import { ListingType } from "@/types/listingType";
 import Colors from "@/constants/Colors";
 import { FontAwesome5, Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
+import config from '@/config';
 
 type Props = {
   category: string;
@@ -26,7 +27,7 @@ const Listings = ({ category }: Props) => {
     const fetchListings = async () => {
       setLoading(true);
       try {
-        const response = await fetch('http://192.168.1.32:8000/api/exercises/');
+        const response = await fetch(`${config.API_BASE_URL}/exercises/`);
         const data = await response.json();
         setListings(data);
         setLoading(false);
