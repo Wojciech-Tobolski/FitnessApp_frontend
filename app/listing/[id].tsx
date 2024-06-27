@@ -224,7 +224,7 @@ const ListingDetails = () => {
           </View>
         </Animated.ScrollView>
       </View>
-{/* 
+
       <Animated.View style={styles.footer} entering={SlideInDown.delay(200)}>
         <TouchableOpacity
           onPress={() => {}}
@@ -235,7 +235,7 @@ const ListingDetails = () => {
         <TouchableOpacity onPress={() => {}} style={styles.footerBtn}>
           <Text style={styles.footerBtnTxt}>Details</Text>
         </TouchableOpacity>
-      </Animated.View> */}
+      </Animated.View>
     </>
   );
 };

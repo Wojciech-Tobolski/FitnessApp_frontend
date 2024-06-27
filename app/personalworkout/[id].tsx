@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
+  Dimensions,
   FlatList,
   Image,
   ListRenderItem,
@@ -10,6 +11,15 @@ import {
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import Colors from "@/constants/Colors";
+import Animated, {
+  SlideInDown,
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from "react-native-reanimated";
+const { width } = Dimensions.get("window");
 
 type ExerciseType = {
   id: number;
@@ -107,6 +117,7 @@ const WorkoutDetails = () => {
   }
 
   return (
+  <>
     <View style={styles.container}>
       <Text style={styles.title}>{workout.title}</Text>
       <FlatList
@@ -115,7 +126,20 @@ const WorkoutDetails = () => {
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={{ paddingBottom: 20 }}
       />
+
     </View>
+          <Animated.View style={styles.footer} entering={SlideInDown.delay(200)}>
+          <TouchableOpacity
+            onPress={() => {}}
+            style={[styles.footerBtn, styles.footerBookBtn]}
+          >
+            <Text style={styles.footerBtnTxt}>Start workout</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => {}} style={styles.footerBtn}>
+            <Text style={styles.footerBtnTxt}>Details</Text>
+          </TouchableOpacity>
+        </Animated.View>
+    </>
   );
 };
 
@@ -164,5 +188,31 @@ const styles = StyleSheet.create({
   itemDescription: {
     fontSize: 14,
     color: Colors.gray,
+  },
+  footerBtn: {
+    flex: 1,
+    backgroundColor: Colors.black,
+    padding: 20,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  footerBookBtn: {
+    flex: 2,
+    backgroundColor: Colors.primaryColor,
+    marginRight: 20,
+  },
+  footerBtnTxt: {
+    color: Colors.white,
+    fontSize: 16,
+    fontWeight: "600",
+    textTransform: "uppercase",
+  },
+  footer: {
+    flexDirection: "row",
+    position: "absolute",
+    bottom: 0,
+    padding: 20,
+    paddingBottom: 30,
+    width: width,
   },
 });
