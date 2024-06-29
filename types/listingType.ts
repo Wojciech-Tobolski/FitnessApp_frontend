@@ -1,4 +1,4 @@
-export interface ListingType {
+export interface ExerciseType {
   id: number;
   title: string;
   short_description: string;

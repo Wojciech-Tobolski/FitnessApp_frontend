@@ -1,24 +1,15 @@
-import React, { useEffect, useState, useRef, useLayoutEffect} from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import Colors from '@/constants/Colors';
 import ExerciseTemplate from '@/template/ExerciseTemplate';
 import config from '@/config';
-import { useNavigation } from '@react-navigation/native';
 
-const ListingDetails = () => {
+const ExerciseDetails = () => {
   const { id } = useLocalSearchParams();
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const router = useRouter();
-  const navigation = useNavigation();
-
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerShown: false,
-    });
-  }, [navigation]);
 
   useEffect(() => {
     if (!id) {
@@ -31,19 +22,7 @@ const ListingDetails = () => {
       try {
         const response = await fetch(`${config.API_BASE_URL}/exercises/${id}/`);
         const data = await response.json();
-        const styledHtmlContent = `
-          <style>
-            body {
-              font-size: 45px; /* Zwiększ rozmiar czcionki */
-              line-height: 1.6; /* Zwiększ interlinię */
-            }
-          </style>
-          ${data.html_content}
-        `;
-        setListing({
-          ...data,
-          html_content: styledHtmlContent,
-        });
+        setListing(data);
         setLoading(false);
       } catch (error) {
         setError(error.message);
@@ -76,13 +55,13 @@ const ListingDetails = () => {
       htmlContent={listing.html_content}
       onBack={() => router.back()}
       onBookmark={() => {}}
-      onPrev={() => console.log('Previous exercise')}
-      onNext={() => console.log('Next exercise')}
+      onPrev={() => {}}
+      onNext={() => {}}
     />
   );
 };
 
-export default ListingDetails;
+export default ExerciseDetails;
 
 const styles = StyleSheet.create({
   loadingContainer: {

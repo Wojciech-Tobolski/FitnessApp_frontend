@@ -1,33 +1,15 @@
-import React, { useEffect, useState } from "react";
-import {
-  Dimensions,
-  FlatList,
-  Image,
-  ListRenderItem,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { useRouter, useLocalSearchParams } from "expo-router";
-import Colors from "@/constants/Colors";
-import Animated, {
-  SlideInDown,
-  interpolate,
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-  withTiming,
-} from "react-native-reanimated";
+import React, { useEffect, useState, useLayoutEffect } from 'react';
+import { Dimensions, FlatList, Image, ListRenderItem, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
+import Colors from '@/constants/Colors';
+import Animated, { SlideInDown } from 'react-native-reanimated';
 import config from '@/config';
-const { width } = Dimensions.get("window");
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '@/template/AppNavigator'; // Upewnij się, że ścieżka jest poprawna
+import { ExerciseType } from '@/types/listingType'; // Zaktualizuj ścieżkę w zależności od lokalizacji pliku types
 
-type ExerciseType = {
-  id: number;
-  title: string;
-  short_description: string;
-  image: string;
-};
+const { width } = Dimensions.get('window');
 
 type WorkoutType = {
   id: number;
@@ -35,17 +17,28 @@ type WorkoutType = {
   exercises: number[];
 };
 
+type WorkoutDetailsScreenNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  'Exercise'
+>;
+
 const WorkoutDetails = () => {
   const { id } = useLocalSearchParams();
   const [workout, setWorkout] = useState<WorkoutType | null>(null);
   const [exercises, setExercises] = useState<ExerciseType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
+  const navigation = useNavigation<WorkoutDetailsScreenNavigationProp>();
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerShown: false,
+    });
+  }, [navigation]);
 
   useEffect(() => {
     if (!id) {
-      setError("No ID provided");
+      setError('No ID provided');
       setLoading(false);
       return;
     }
@@ -60,21 +53,19 @@ const WorkoutDetails = () => {
         const workoutData = await response.json();
         setWorkout(workoutData);
 
-        // Fetch exercises data
         const exerciseIds = workoutData.exercises.join(',');
         const exercisesResponse = await fetch(`${config.API_BASE_URL}/exercises/`);
         if (!exercisesResponse.ok) {
           throw new Error(`HTTP error! status: ${exercisesResponse.status}`);
         }
         const exercisesData = await exercisesResponse.json();
-        // Filter exercises to include only those in the workout
         const filteredExercises = exercisesData.filter((exercise: ExerciseType) =>
           workoutData.exercises.includes(exercise.id)
         );
         setExercises(filteredExercises);
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching workout or exercises:", error);
+        console.error('Error fetching workout or exercises:', error);
         setError(error.message);
         setLoading(false);
       }
@@ -82,6 +73,22 @@ const WorkoutDetails = () => {
 
     fetchWorkout();
   }, [id]);
+
+  const startWorkout = async () => {
+    setLoading(true);
+    try {
+      if (workout && exercises.length > 0) {
+        setLoading(false);
+        navigation.navigate('Exercise', { workoutId: workout.id, exercises, initialIndex: 0 });
+      } else {
+        setError('No exercises found for this workout');
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error(error);
+      setLoading(false);
+    }
+  };
 
   const renderItem: ListRenderItem<ExerciseType> = ({ item }) => (
     <View style={styles.item}>
@@ -118,28 +125,24 @@ const WorkoutDetails = () => {
   }
 
   return (
-  <>
-    <View style={styles.container}>
-      <Text style={styles.title}>{workout.title}</Text>
-      <FlatList
-        data={exercises}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={{ paddingBottom: 20 }}
-      />
-
-    </View>
-          <Animated.View style={styles.footer} entering={SlideInDown.delay(200)}>
-          <TouchableOpacity
-            onPress={() => {}}
-            style={[styles.footerBtn, styles.footerBookBtn]}
-          >
-            <Text style={styles.footerBtnTxt}>Start workout</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => {}} style={styles.footerBtn}>
-            <Text style={styles.footerBtnTxt}>Details</Text>
-          </TouchableOpacity>
-        </Animated.View>
+    <>
+      <View style={styles.container}>
+        <Text style={styles.title}>{workout.title}</Text>
+        <FlatList
+          data={exercises}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id.toString()}
+          contentContainerStyle={{ paddingBottom: 20 }}
+        />
+      </View>
+      <Animated.View style={styles.footer} entering={SlideInDown.delay(200)}>
+        <TouchableOpacity onPress={startWorkout} style={[styles.footerBtn, styles.footerBookBtn]}>
+          <Text style={styles.footerBtnTxt}>Start workout</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => {}} style={styles.footerBtn}>
+          <Text style={styles.footerBtnTxt}>Details</Text>
+        </TouchableOpacity>
+      </Animated.View>
     </>
   );
 };
@@ -154,12 +157,12 @@ const styles = StyleSheet.create({
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   title: {
     fontSize: 24,
-    fontWeight: "600",
+    fontWeight: '600',
     color: Colors.black,
     marginBottom: 20,
   },
@@ -168,21 +171,21 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
     marginBottom: 20,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 1.5,
     elevation: 3,
   },
   image: {
-    width: "100%",
+    width: '100%',
     height: 200,
     borderRadius: 10,
     marginBottom: 10,
   },
   itemTxt: {
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: '600',
     color: Colors.black,
     marginBottom: 5,
   },
@@ -195,7 +198,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.black,
     padding: 20,
     borderRadius: 10,
-    alignItems: "center",
+    alignItems: 'center',
   },
   footerBookBtn: {
     flex: 2,
@@ -205,12 +208,12 @@ const styles = StyleSheet.create({
   footerBtnTxt: {
     color: Colors.white,
     fontSize: 16,
-    fontWeight: "600",
-    textTransform: "uppercase",
+    fontWeight: '600',
+    textTransform: 'uppercase',
   },
   footer: {
-    flexDirection: "row",
-    position: "absolute",
+    flexDirection: 'row',
+    position: 'absolute',
     bottom: 0,
     padding: 20,
     paddingBottom: 30,

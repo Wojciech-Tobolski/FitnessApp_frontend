@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import Colors from "@/constants/Colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import config from "@/config";
 
 type Props = {
   onCategoryChanged: (category: string) => void;
@@ -27,7 +28,7 @@ const CategoryButtons = ({ onCategoryChanged }: Props) => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch('http://192.168.1.32:8000/api/exercise-types/');
+        const response = await fetch(`${config.API_BASE_URL}/exercise-types/`);
         const data: Category[] = await response.json();
         setCategories([{ id: 0, type_name: "Wszystkie" }, ...data]);  // Dodaj kategorię "Wszystkie"
       } catch (error) {
